@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bin ich für die Studie geeignet?</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-white to-blue-50 font-sans min-h-screen flex flex-col items-center">
+
+  <!-- HEADER mit DSBG Logo -->
+  <header class="w-full flex justify-start items-center px-6 py-4 bg-white shadow-md">
+    <img src="Logo-DSBG.png" alt="DSBG Logo" class="h-12">
+  </header>
+
+  <!-- Content Container: Projektlogo + Karte -->
+  <div class="flex flex-col items-center mt-12 mb-16 w-full">
+    <!-- Projektslogo groß, zentriert -->
+    <img src="Logo_Transparent.svg" alt="Projekt Logo" class="mx-auto h-56 md:h-64 mb-8">
+
+    <!-- WRAP / CARD -->
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-2xl overflow-hidden">
+      <!-- CARD HEADER -->
+      <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-b from-blue-100 to-white">
+        <h1 class="text-xl font-semibold text-center">Bin ich für die Studie geeignet?</h1>
+      </div>
+
+      <!-- CARD CONTENT -->
+      <div class="p-6 space-y-6">
+        <!-- Startscreen -->
+        <div id="screen-start">
+          <h2 class="text-2xl font-semibold text-center">Willkommen zur Teilnahmeprüfung</h2>
+          <p class="text-gray-700 mt-2 text-center">Vielen Dank für Ihr Interesse an unserer Studie. Auf den folgenden Seiten beantworten Sie einige Fragen, um herauszufinden, ob Sie die Teilnahmevoraussetzungen erfüllen. Das Ausfüllen dauert nur wenige Minuten.</p>
+          <div class="mt-6 flex justify-center">
+            <button id="startBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">Jetzt starten</button>
+          </div>
+        </div>
+
+        <!-- Frage Screen -->
+        <div id="screen-question" class="hidden">
+          <div id="progress" class="flex gap-2 mb-4" aria-hidden="true"></div>
+          <div id="qtext" class="text-xl font-medium mb-4" aria-live="polite"></div>
+          <div id="options" class="grid gap-3"></div>
+          <div class="flex justify-between mt-4 text-gray-500 text-sm">
+            <span id="counter"></span>
+            <button id="restartBtn" class="px-3 py-1 border rounded-lg hover:bg-gray-100">Neu starten</button>
+          </div>
+        </div>
+
+        <!-- Erfolg Screen -->
+        <div id="screen-success" class="hidden text-center" aria-live="polite">
+          <div class="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-full border border-green-500 bg-green-50 text-green-700 font-medium">
+            <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div> Voraussetzung erfüllt
+          </div>
+          <h2 class="text-2xl font-semibold mb-2">Sie erfüllen die Kriterien der Studie.</h2>
+          <p class="text-gray-600 mb-4">Sie können sich nun hier melden...</p>
+          <div class="flex justify-center gap-4">
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">Weiter</button>
+            <button id="restartBtn2" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Nochmals testen</button>
+          </div>
+        </div>
+
+        <!-- Fail Screen -->
+        <div id="screen-fail" class="hidden text-center" aria-live="polite">
+          <div class="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-full border border-red-500 bg-red-50 text-red-700 font-medium">
+            <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div> Leider nicht geeignet
+          </div>
+          <h2 class="text-2xl font-semibold mb-2">Das hat leider nicht geklappt.</h2>
+          <p id="fail-reason" class="text-gray-600 mb-4"></p>
+          <div class="flex justify-center">
+            <button id="restartBtn3" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Neu starten</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT bleibt unverändert -->
+  <script>
+    const QUESTIONS = [
+      { text: "Können Sie fliessend Deutsch lesen und schreiben?", failReason: "Deutschkenntnisse sind eine Voraussetzung für die Teilnahme.", options: [{label:"Ja", correct:true},{label:"Nein", correct:false}] },
+      { text: "Sind Sie 60 Jahre alt oder älter?", failReason: "Das Mindestalter für die Studie beträgt 60 Jahre.", options: [{label:"Ja", correct:true},{label:"Nein", correct:false}] },
+      { text: "Sind Sie in der Lage, selbstständig zu gehen (eine Gehhilfe ist kein Problem)?", failReason: "Während der Tests ist selbstständiges Gehen erforderlich.", options: [{label:"Ja", correct:true},{label:"Nein", correct:false}] },
+      { text: "Sind Sie bereit, an mehreren Tagen an der Studie teilzunehmen (über zwei Wochen)?", failReason: "Die Datenerhebung erfolgt über zwei Wochen.", options: [{label:"Ja", correct:true},{label:"Nein", correct:false}] },
+      { text: "Sind Sie bereit, Neues zu lernen und den Studienkoordinator:innen zu folgen?", failReason: "Offenheit und Mitarbeit sind erforderlich.", options: [{label:"Ja", correct:true},{label:"Nein", correct:false}] },
+      { text: "Sind Sie bereit, Sensoren zur Messung von Luftverschmutzung und Bewegung an Ihrem Körper zu tragen?", failReason: "Das Tragen der Sensoren ist Teil der Datenerhebung.", options: [{label:"Ja", correct:true},{label:"Nein", correct:false}] },
+      { text: "Haben Sie eine chronische Atemwegserkrankung (z. B. COPD, Asthma)?", failReason: "Die Angabe zu chronischen Atemwegserkrankungen ist erforderlich.", options: [{label:"Ja", correct:true, nextBlock:"respiratoryYes"},{label:"Nein", correct:true, nextBlock:"respiratoryNo"}] }
+    ];
+
+    const BLOCKS = {
+      respiratoryYes: [
+        { text: "Haben Sie eine Diagnose für COPD?", failReason: "Diese Information ist erforderlich.", options:[{label:"Ja", correct:true},{label:"Nein", correct:true}] },
+        { text: "Haben Sie eine Diagnose für Asthma?", failReason: "Sie erfüllen leider nicht die Studienbedingungen.", options:[{label:"Ja", correct:false},{label:"Nein", correct:true}] },
+        { text: "Ist Ihr letzter Spitalaufenthalt mindestens vier Wochen her und sind Sie aktuell stabil?", failReason: "Sie erfüllen nicht die Kriterien der Studie.", options:[{label:"Ja", correct:true},{label:"Nein", correct:false}] },
+        { text: "Hatten Sie in den letzten sechs Monaten eine Operation an der Lunge?", failReason: "Sie erfüllen nicht die Kriterien der Studie.", options:[{label:"Ja", correct:false},{label:"Nein", correct:true}] },
+        { text: "Wurde Ihre Lunge in den letzten Monaten durch einen Eingriff verkleinert?", failReason: "Sie erfüllen nicht die Kriterien der Studie.", options:[{label:"Ja", correct:false},{label:"Nein", correct:true}] }
+      ],
+      respiratoryNo: [
+        { text: "Haben Sie eine Diagnose für eine Atemwegserkrankung?", failReason: "Bitte beantworten Sie die Frage korrekt.", options:[{label:"Ja", correct:false},{label:"Nein", correct:true}] }
+      ]
+    };
+
+    let sequence = [...QUESTIONS];
+    let idx = 0;
+
+    const el = {
+      progress: document.getElementById('progress'),
+      qtext: document.getElementById('qtext'),
+      options: document.getElementById('options'),
+      counter: document.getElementById('counter'),
+      screenStart: document.getElementById('screen-start'),
+      screenQuestion: document.getElementById('screen-question'),
+      screenSuccess: document.getElementById('screen-success'),
+      screenFail: document.getElementById('screen-fail'),
+      failReason: document.getElementById('fail-reason'),
+      restartBtn: document.getElementById('restartBtn'),
+      restartBtn2: document.getElementById('restartBtn2'),
+      restartBtn3: document.getElementById('restartBtn3'),
+      startBtn: document.getElementById('startBtn')
+    };
+
+    function renderProgress() {
+      el.progress.innerHTML = '';
+      for (let i=0;i<sequence.length;i++){
+        const seg=document.createElement('div'); seg.className='flex-1 h-2 bg-gray-200 rounded-full overflow-hidden';
+        const fill=document.createElement('div'); fill.className='h-full bg-gradient-to-r from-blue-500 to-blue-700'; fill.style.width = i<idx?'100%':'0%';
+        seg.appendChild(fill); el.progress.appendChild(seg);
+      }
+    }
+
+    function renderQuestion() {
+      renderProgress();
+      const q = sequence[idx];
+      el.qtext.textContent = q.text;
+      el.counter.textContent = `Frage ${idx+1} von ${sequence.length}`;
+      el.options.innerHTML = '';
+      q.options.forEach((opt,i)=>{
+        const b=document.createElement('button');
+        b.className='w-full text-left px-4 py-3 border rounded-lg hover:bg-gray-100';
+        b.textContent=opt.label; b.type='button';
+        b.addEventListener('click',()=>onAnswer(opt,q.failReason));
+        el.options.appendChild(b);
+      });
+      showScreen('question');
+    }
+
+    function onAnswer(option, failReason){
+      if(option.correct===false){el.failReason.textContent=failReason;showScreen('fail');return;}
+      if(option.nextBlock){sequence=[...sequence.slice(0,idx+1),...BLOCKS[option.nextBlock]];}
+      idx++; idx>=sequence.length?showScreen('success'):renderQuestion();
+    }
+
+    function showScreen(name){
+      const map={
+        start:[el.screenStart,[el.screenQuestion,el.screenSuccess,el.screenFail]],
+        question:[el.screenQuestion,[el.screenStart,el.screenSuccess,el.screenFail]],
+        success:[el.screenSuccess,[el.screenStart,el.screenQuestion,el.screenFail]],
+        fail:[el.screenFail,[el.screenStart,el.screenQuestion,el.screenSuccess]]
+      }[name];
+      map[0].classList.remove('hidden'); map[1].forEach(x=>x.classList.add('hidden'));
+    }
+
+    function restart(){
