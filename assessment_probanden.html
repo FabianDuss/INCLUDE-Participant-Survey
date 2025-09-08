@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bin ich für die Studie geeignet?</title>
+  <style>
+    :root {
+      --bg: #f6f8ff;
+      --card: #ffffff;
+      --text: #1f2433;
+      --muted: #616b86;
+      --accent: #3b6ef7;
+      --accent-strong: #2554f0;
+      --danger: #d92d20;
+      --success: #16a34a;
+      --radius: 16px;
+      --border: rgba(0,0,0,0.10);
+      --border-strong: rgba(0,0,0,0.18);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'; background: radial-gradient(1200px 600px at 10% -10%, #e9eeff 0%, var(--bg) 55%); color: var(--text); }
+    .wrap { min-height: 100svh; display: grid; place-items: center; padding: 24px; }
+    .card { width: min(720px, 100%); background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.0)), var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(18, 28, 80, 0.08); overflow: hidden; }
+    .hdr { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; background: linear-gradient(180deg, rgba(59,110,247,0.08), rgba(255,255,255,0.4)); }
+    .hdr .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(59,110,247,0.22); }
+    .hdr h1 { font-size: 18px; margin: 0; letter-spacing: .2px; color: var(--text); }
+
+    .content { padding: 26px 22px 28px; }
+    .progress { display: flex; gap: 6px; margin-bottom: 12px; }
+    .progress .p { flex: 1; height: 6px; border-radius: 999px; background: rgba(0,0,0,0.06); overflow: hidden; }
+    .progress .p > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-strong)); }
+
+    .qtext { font-size: 22px; line-height: 1.35; margin: 12px 0 18px; color: var(--text); }
+
+    .options { display: grid; gap: 10px; margin: 14px 0 6px; }
+    .btn { appearance: none; border: 1px solid var(--border); background: #ffffff; color: var(--text); padding: 14px 16px; border-radius: 12px; cursor: pointer; font-size: 16px; text-align: left; transition: transform .06s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+    .btn:hover { transform: translateY(-1px); border-color: var(--border-strong); background: #f7faff; box-shadow: 0 4px 16px rgba(37,84,240,0.08); }
+    .btn:focus-visible { outline: 3px solid rgba(59,110,247,0.35); outline-offset: 2px; }
+
+    .meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 16px; color: var(--muted); font-size: 14px; }
+
+    .result { text-align: center; padding: 36px 16px 22px; }
+    .result h2 { margin: 0 0 6px; font-size: 28px; color: var(--text); }
+    .result p { margin: 0 0 18px; color: var(--muted); }
+
+    .row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .ghost, .primary { border: 1px solid var(--border); padding: 12px 14px; border-radius: 12px; cursor: pointer; font-size: 15px; }
+    .ghost { background: #ffffff; color: var(--text); }
+    .primary { background: var(--accent-strong); border-color: var(--accent-strong); color: white; }
+    .ghost:hover { background: #f7faff; border-color: var(--border-strong); }
+    .primary:hover { filter: brightness(0.95); }
+
+    .badge { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--border); background: #ffffff; color: var(--text); }
+    .badge i { width: 10px; height: 10px; border-radius: 50%; }
+    .badge.success i { background: var(--success); box-shadow: 0 0 0 4px rgba(22,163,74,0.18); }
+    .badge.fail i { background: var(--danger); box-shadow: 0 0 0 4px rgba(217,45,32,0.18); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="application" aria-labelledby="sa-title">
+      <div class="hdr">
+        <div class="dot" aria-hidden="true"></div>
+        <h1 id="sa-title">Bin ich für die Studie geeignet?</h1>
+      </div>
+      <div class="content">
+        <!-- Startseite -->
+        <div id="screen-start">
+          <h2>Willkommen zur Teilnahmeprüfung</h2>
+          <p>Vielen Dank für Ihr Interesse an unserer Studie. Auf den folgenden Seiten beantworten Sie einige Fragen, um herauszufinden, ob Sie die Teilnahmevoraussetzungen erfüllen. Das Ausfüllen dauert nur wenige Minuten.</p>
+          <div class="row" style="margin-top:20px;">
+            <button class="primary" type="button" id="startBtn">Jetzt starten</button>
+          </div>
+        </div>
+
+        <div id="screen-question" class="hidden">
+          <div class="progress" aria-hidden="true" id="progress"></div>
+          <div id="qtext" class="qtext" aria-live="polite"></div>
+          <div id="options" class="options"></div>
+          <div class="meta">
+            <span id="counter"></span>
+            <button class="ghost" id="restartBtn" type="button">Neu starten</button>
+          </div>
+        </div>
+
+        <div id="screen-success" class="result hidden" aria-live="polite">
+          <div class="badge success"><i></i> Voraussetzung erfüllt</div>
+          <h2>Sie erfüllen die Kriterien der Studie.</h2>
+          <p>Sie können sich nun hier melden...</p>
+          <div class="row">
+            <button class="primary" type="button" onclick="location.href='#'">Weiter</button>
+            <button class="ghost" type="button" id="restartBtn2">Nochmals testen</button>
+          </div>
+        </div>
+
+        <div id="screen-fail" class="result hidden" aria-live="polite">
+          <div class="badge fail"><i></i> Leider nicht geeignet</div>
+          <h2>Das hat leider nicht geklappt.</h2>
+          <p id="fail-reason">Basierend auf Ihrer Antwort erfüllen Sie aktuell nicht die Anforderungen.</p>
+          <div class="row">
+            <button class="ghost" type="button" id="restartBtn3">Neu starten</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === CONFIG: Fragen & Antworten mit Verzweigungen ===
+    const QUESTIONS = [
+      {
+        text: "Können Sie fliessend Deutsch lesen und schreiben?",
+        failReason: "Deutschkenntnisse sind eine Voraussetzung für die Teilnahme.",
+        options: [
+          { label: "Ja", correct: true },
+          { label: "Nein", correct: false }
+        ]
+      },
+      {
+        text: "Sind Sie 60 Jahre alt oder älter?",
+        failReason: "Das Mindestalter für die Studie beträgt 60 Jahre.",
+        options: [
+          { label: "Ja", correct: true },
+          { label: "Nein", correct: false }
+        ]
+      },
+      {
+        text: "Sind Sie in der Lage, selbstständig zu gehen (eine Gehhilfe ist kein Problem)?",
+        failReason: "Während der Tests ist selbstständiges Gehen erforderlich (Gehhilfen sind erlaubt).",
+        options: [
+          { label: "Ja", correct: true },
+          { label: "Nein", correct: false }
+        ]
+      },
+      {
+        text: "Sind Sie bereit, an mehreren Tagen an der Studie teilzunehmen (über zwei Wochen)?",
+        failReason: "Die Datenerhebung erfolgt über einen Zeitraum von zwei Wochen.",
+        options: [
+          { label: "Ja", correct: true },
+          { label: "Nein", correct: false }
+        ]
+      },
+      {
+        text: "Sind Sie bereit, Neues zu lernen und den Studienkoordinator:innen zu folgen?",
+        failReason: "Während der Datenerhebung können neue Situationen auftreten – Offenheit und Mitarbeit sind erforderlich.",
+        options: [
+          { label: "Ja", correct: true },
+          { label: "Nein", correct: false }
+        ]
+      },
+      {
+        text: "Sind Sie bereit, Sensoren zur Messung von Luftverschmutzung und Bewegung an Ihrem Körper zu tragen?",
+        failReason: "Das Tragen der Sensoren ist Teil der Datenerhebung.",
+        options: [
+          { label: "Ja", correct: true },
+          { label: "Nein", correct: false }
+        ]
+      },
+      {
+        text: "Haben Sie eine chronische Atemwegserkrankung (z. B. COPD, Asthma)?",
+        failReason: "Die Angabe zu chronischen Atemwegserkrankungen ist erforderlich.",
+        options: [
+          { label: "Ja", correct: true, nextBlock: "respiratoryYes" },
+          { label: "Nein", correct: true, nextBlock: "respiratoryNo" }
+        ]
+      }
+    ];
+
+    // Folgeblöcke
+    const BLOCKS = {
+      respiratoryYes: [
+        {
+          text: "Haben Sie eine Diagnose für COPD?",
+          failReason: "Diese Information ist erforderlich.",
+          options: [
+            { label: "Ja", correct: true },
+            { label: "Nein", correct: true }
+          ]
+        },
+        {
+          text: "Haben Sie eine Diagnose für Asthma?",
+          failReason: "Sie erfüllen leider nicht die Studienbedingungen.",
+          options: [
+            { label: "Ja", correct: false },
+            { label: "Nein", correct: true }
+          ]
+        },
+        {
+          text: "Ist Ihr letzter Spitalaufenthalt mindestens vier Wochen her und sind Sie aktuell stabil?",
+          failReason: "Sie erfüllen nicht die Kriterien der Studie.",
+          options: [
+            { label: "Ja", correct: true },
+            { label: "Nein", correct: false }
+          ]
+        },
+        {
+          text: "Hatten Sie in den letzten sechs Monaten eine Operation an der Lunge?",
+          failReason: "Sie erfüllen nicht die Kriterien der Studie.",
+          options: [
+            { label: "Ja", correct: false },
+            { label: "Nein", correct: true }
+          ]
+        },
+        {
+          text: "Wurde Ihre Lunge in den letzten Monaten durch einen Eingriff verkleinert?",
+          failReason: "Sie erfüllen nicht die Kriterien der Studie.",
+          options: [
+            { label: "Ja", correct: false },
+            { label: "Nein", correct: true }
+          ]
+        }
+
+      ],
+      respiratoryNo: [
+        {
+          text: "Haben Sie eine Diagnose für eine Atemwegserkrankung?",
+          failReason: "Bitte beantworten Sie die Frage zu chronischen Atemwegserkrankungen korrekt.",
+          options: [
+            { label: "Ja", correct: false },
+            { label: "Nein", correct: true }
+          ]
+        }
+      ]
+    };
+
+    let sequence = [...QUESTIONS];
+
+    const el = {
+      progress: document.getElementById('progress'),
+      qtext: document.getElementById('qtext'),
+      options: document.getElementById('options'),
+      counter: document.getElementById('counter'),
+      screenStart: document.getElementById('screen-start'),
+      screenQuestion: document.getElementById('screen-question'),
+      screenSuccess: document.getElementById('screen-success'),
+      screenFail: document.getElementById('screen-fail'),
+      failReason: document.getElementById('fail-reason'),
+      restartBtn: document.getElementById('restartBtn'),
+      restartBtn2: document.getElementById('restartBtn2'),
+      restartBtn3: document.getElementById('restartBtn3'),
+      startBtn: document.getElementById('startBtn')
+    };
+
+    let idx = 0;
+
+    function renderProgress() {
+      el.progress.innerHTML = '';
+      for (let i = 0; i < sequence.length; i++) {
+        const seg = document.createElement('div');
+        seg.className = 'p';
+        const fill = document.createElement('i');
+        if (i < idx) fill.style.width = '100%';
+        el.progress.appendChild(seg);
+        seg.appendChild(fill);
+      }
+    }
+
+    function renderQuestion() {
+      renderProgress();
+      const q = sequence[idx];
+      el.qtext.textContent = q.text;
+      el.counter.textContent = `Frage ${idx + 1} von ${sequence.length}`;
+      el.options.innerHTML = '';
+
+      q.options.forEach((opt, i) => {
+        const b = document.createElement('button');
+        b.className = 'btn';
+        b.type = 'button';
+        b.textContent = opt.label;
+        b.setAttribute('aria-label', `${opt.label} – Option ${i+1} von ${q.options.length}`);
+        b.addEventListener('click', () => onAnswer(opt, q.failReason));
+        el.options.appendChild(b);
+      });
+
+      showScreen('question');
+    }
+
+    function onAnswer(option, failReason) {
+      if (option.correct === false) {
+        el.failReason.textContent = failReason;
+        showScreen('fail');
+        return;
+      }
+
+      // Falls ein nextBlock definiert ist, füge die Folgefragen ein
+      if (option.nextBlock) {
+        sequence = [...sequence.slice(0, idx+1), ...BLOCKS[option.nextBlock]];
+      }
+
+      idx++;
+      if (idx >= sequence.length) {
+        showScreen('success');
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function showScreen(name) {
+      const map = {
+        start: [el.screenStart, [el.screenQuestion, el.screenSuccess, el.screenFail]],
+        question: [el.screenQuestion, [el.screenStart, el.screenSuccess, el.screenFail]],
+        success: [el.screenSuccess, [el.screenStart, el.screenQuestion, el.screenFail]],
+        fail: [el.screenFail, [el.screenStart, el.screenQuestion, el.screenSuccess]]
+      }[name];
+      map[0].classList.remove('hidden');
+      map[1].forEach(x => x.classList.add('hidden'));
+    }
+
+    function restart() {
+      idx = 0;
+      sequence = [...QUESTIONS];
+      renderQuestion();
+    }
+
+    el.restartBtn.addEventListener('click', restart);
+    el.restartBtn2.addEventListener('click', restart);
+    el.restartBtn3.addEventListener('click', restart);
+
+    el.startBtn.addEventListener('click', () => {
+      restart();
+      showScreen('question');
+    });
+
+    // Initial Startseite anzeigen
+    showScreen('start');
+  </script>
+</body>
+</html>
+
+
+
+<!-- Bei Success: "Weiter" Button noch nutzlos, könnte man mit  Anmeldeformular verknüpfen.-->
